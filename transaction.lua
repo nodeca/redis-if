@@ -4,7 +4,9 @@ local params = cjson.decode(ARGV[1])
 
 -- Check conditions
 for __, check in pairs(params["if"]) do
-    if check[2] == "==" then
+    if #check == 2 then
+        if check[1] ~= redis.call(unpack(check[2])) then return 0 end
+    elseif check[2] == "==" then
         if check[1] ~= redis.call(unpack(check[3])) then return 0 end
     elseif check[2] == "!=" then
         if check[1] == redis.call(unpack(check[3])) then return 0 end

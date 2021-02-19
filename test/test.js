@@ -65,7 +65,7 @@ it('should execute conditions until one fails', async function () {
   }))
 
   assert.strictEqual(res, 0)
-  assert.deepStrictEqual(await redis.smembers(`${ns}key`), ['aaa', 'bbb'])
+  assert.deepStrictEqual((await redis.smembers(`${ns}key`)).sort(), ['aaa', 'bbb'])
 })
 
 it('should execute conditions on success', async function () {
@@ -135,6 +135,20 @@ it('should support < operator', async function () {
 
   assert.strictEqual(await redis.transaction(JSON.stringify({
     if: [['ccc', '<', ['get', `${ns}foo`]]],
+    exec: []
+  })), 0)
+})
+
+it('should check == operator if there are only 2 arguments', async function () {
+  await redis.set(`${ns}foo`, 'bbb')
+
+  assert.strictEqual(await redis.transaction(JSON.stringify({
+    if: [['bbb', ['get', `${ns}foo`]]],
+    exec: []
+  })), 1)
+
+  assert.strictEqual(await redis.transaction(JSON.stringify({
+    if: [['ccc', ['get', `${ns}foo`]]],
     exec: []
   })), 0)
 })

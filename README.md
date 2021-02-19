@@ -28,13 +28,15 @@ API
 
 Script requires single param - stringified JS object with conditions & commands.
 
-Every condition is `[ value, compare_operator, [ redis cmd with params] ]`.
+Every condition is `[ value, compare_operator, [ redis cmd with params ] ]`.
 Supported operators are:
 
 - `==`
 - `!=`.
 - `>`
 - `<`
+
+You can use `[ value, [ redis cmd with params ] ]` form, in which case `==` operator is checked.
 
 ```js
 {
