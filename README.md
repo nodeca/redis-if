@@ -5,14 +5,14 @@ redis-if
 [![NPM version](https://img.shields.io/npm/v/redis-if.svg?style=flat)](https://www.npmjs.org/package/redis-if)
 
 
-> Easy to use conditional transactions in redis. Effectively replaces other custom scripts.
+> Easy to use conditional transactions in Redis. Effectively replaces other custom scripts.
 
 Simple script for atomic "check & run" in Redis:
 
 - check multiple conditions
 - execute multiple commands if all conditions are satisfied
 
-Very often this pattern allows to avoid custom scripting.
+Very often this pattern helps to avoid custom scripting.
 
 
 Install
@@ -28,15 +28,9 @@ API
 
 Script requires single param - stringified JS object with conditions & commands.
 
-Every condition is `[ value, compare_operator, [ redis cmd with params ] ]`.
-Supported operators are:
+Every condition is `[ value, '==' | '!=' | '>' | '<', [ redis cmd with params ] ]`.
 
-- `==`
-- `!=`.
-- `>`
-- `<`
-
-You can use `[ value, [ redis cmd with params ] ]` form, in which case `==` operator is checked.
+For `'=='` you can use short form: `[ value, [ redis cmd with params ] ]`.
 
 ```js
 {
