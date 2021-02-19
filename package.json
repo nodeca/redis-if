@@ -13,9 +13,11 @@
     "transaction.lua"
   ],
   "scripts": {
-    "test": "standard"
+    "test": "standard && mocha"
   },
   "devDependencies": {
+    "ioredis": "^4.22.0",
+    "mocha": "^8.3.0",
     "standard": "^16.0.3"
   }
 }

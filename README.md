@@ -10,9 +10,9 @@ redis-if
 Simple script for atomic "check & run" in Redis:
 
 - check multiple conditions
-- execute multiple commands if all conditions satisfied
+- execute multiple commands if all conditions are satisfied
 
-Very often this pattern allows to avoid customs cripting.
+Very often this pattern allows to avoid custom scripting.
 
 
 Install
@@ -40,13 +40,12 @@ Supported operators are:
 {
   // Conditions. All must be satisfied
   if: [
-    [ 1, '==', [ 'zrem', `locked`, `${prefix}${task.id}` ] ]
+    [ 'initialized', '==', [ 'sget', 'custom-state' ] ]
   ],
-  // Commands to execute if all conditions satisfied
+  // Commands to execute if all conditions are satisfied
   exec: [
-    [ 'zadd', 'restart', Date.now() + 5000, task.id ],
-    [ 'hset', `${prefix}${task.id}`, 'state', JSON.stringify('restart') ],
-    [ 'hset', `${prefix}${task.id}`, 'retries', JSON.stringify(new_retries) ]
+    [ 'set', 'custom-state', 'finished' ],
+    [ 'incr', 'custom-counter' ]
   ]
 }
 ```
@@ -55,33 +54,37 @@ Supported operators are:
 Use
 ---
 
-Sample for `ioredis`. Is has built-in script manager and easy to use.
+Sample for `ioredis`. It has built-in script manager and is easy to use.
 
 ```js
-const Redis = require('redis')
+const Redis = require('ioredis')
 
 const redis = new Redis()
 
 redis.defineCommand('transaction', { lua: require('redis-if').script, numberOfKeys: 0 })
 
-let success = await this.__redis__.transaction(JSON.stringify({
+await redis.set('custom-state', 'initialized')
+await redis.set('custom-counter', 0)
+
+// this call will change state and do another unrelated operation (increment) atomically
+let success = await redis.transaction(JSON.stringify({
   if: [
-    // apply changes only if this process aquired lock
-    [ 'eq', 1, [ 'zrem', `locked`, `${prefix}${task.id}` ] ]
+    // apply changes only if this process has acquired a lock
+    [ 'initialized', '==', [ 'sget', 'custom-state' ] ]
   ],
   exec: [
-    [ 'zadd', 'restart', Date.now() + 5000, task.id ],
-    [ 'hset', `${prefix}${task.id}`, 'state', JSON.stringify('restart') ],
-    [ 'hset', `${prefix}${task.id}`, 'retries', JSON.stringify(new_retries) ]
+    [ 'set', 'custom-state', 'finished' ],
+    [ 'incr', 'custom-counter' ]
   ]
 }))
 ```
 
+Return value is 1 if all conditions are satisfied, or 0 if one of the conditions failed.
 
 Dev notes
 ---------
 
-Quik-run redis via docker:
+Quick-run redis via docker:
 
 ```sh
 # start

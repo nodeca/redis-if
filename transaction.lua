@@ -12,6 +12,8 @@ for __, check in pairs(params["if"]) do
         if check[1] <= redis.call(unpack(check[3])) then return 0 end
     elseif check[2] == "<" then
         if check[1] >= redis.call(unpack(check[3])) then return 0 end
+    else
+        error('invalid operator "'..tostring(check[2])..'" (expected "==", "!=", ">" or "<")')
     end
 end
 
