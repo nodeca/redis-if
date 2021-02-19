@@ -1,0 +1,21 @@
+{
+  "name": "redis-if",
+  "version": "0.0.0",
+  "description": "Script for conditional transactions in Redis.",
+  "keywords": [
+    "redis",
+    "transaction"
+  ],
+  "repository": "nodeca/redis-if",
+  "license": "MIT",
+  "files": [
+    "index.js",
+    "transaction.lua"
+  ],
+  "scripts": {
+    "test": "standard"
+  },
+  "devDependencies": {
+    "standard": "^16.0.3"
+  }
+}
